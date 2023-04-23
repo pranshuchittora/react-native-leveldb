@@ -1,15 +1,19 @@
 import * as React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import {
   benchmarkAsyncStorage,
-  benchmarkLeveldb,
+  benchmarkLeveldbBuffer,
+  benchmarkLeveldbStr,
+  benchmarkMMKV,
   BenchmarkResults,
-  BenchmarkResultsView
-} from "./benchmark";
-import {leveldbExample, leveldbTests} from "./example";
+  BenchmarkResultsView,
+} from './benchmark';
+import { leveldbExample, leveldbTests } from './example';
 
 interface BenchmarkState {
-  leveldb?: BenchmarkResults;
+  leveldbBuffer?: BenchmarkResults;
+  leveldbStr?: BenchmarkResults;
+  mmkv?: BenchmarkResults;
   leveldbExample?: boolean;
   leveldbTests: string[];
   asyncStorage?: BenchmarkResults;
@@ -17,17 +21,22 @@ interface BenchmarkState {
 }
 
 export default class App extends React.Component<{}, BenchmarkState> {
-  state: BenchmarkState = {leveldbTests: []};
+  state: BenchmarkState = { leveldbTests: [] };
 
   componentDidMount() {
     try {
       this.setState({
-        leveldb: benchmarkLeveldb(),
-        leveldbExample: leveldbExample(),
-        leveldbTests: leveldbTests(),
+        leveldbStr: benchmarkLeveldbStr(),
+        leveldbBuffer: benchmarkLeveldbBuffer(),
+        // leveldbExample: leveldbExample(),
+        // leveldbTests: leveldbTests(),
       });
-
-      benchmarkAsyncStorage().then(res => this.setState({asyncStorage: res}));
+      benchmarkMMKV().then((res) => {
+        this.setState({
+          mmkv: res,
+        });
+      });
+      // benchmarkAsyncStorage().then(res => this.setState({asyncStorage: res}));
     } catch (e) {
       console.error('Error running benchmark:', e);
     }
@@ -36,13 +45,30 @@ export default class App extends React.Component<{}, BenchmarkState> {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Example validity: {this.state.leveldbExample == undefined ? '' : this.state.leveldbExample ? 'passed' : 'failed'}</Text>
-        {this.state.leveldb && <BenchmarkResultsView title="LevelDB" {...this.state.leveldb} />}
-        {this.state.leveldbTests && this.state.leveldbTests.map((msg, idx) =>
-          <Text key={idx}>Test: {msg}</Text>
+        <Text>
+          Example validity:{' '}
+          {this.state.leveldbExample == undefined
+            ? ''
+            : this.state.leveldbExample
+            ? 'passed'
+            : 'failed'}
+        </Text>
+        {this.state.leveldbBuffer && (
+          <BenchmarkResultsView title="LevelDB Buffer" {...this.state.leveldbBuffer} />
         )}
-        {this.state.asyncStorage && <BenchmarkResultsView title="AsyncStorage" {...this.state.asyncStorage} />}
-        {this.state.error && <Text>ERROR RUNNING: {this.state.error}</Text>}
+        {this.state.leveldbStr && (
+          <BenchmarkResultsView title="LevelDB String" {...this.state.leveldbStr} />
+        )}
+        {this.state.leveldbTests &&
+          this.state.leveldbTests.map((msg, idx) => (
+            <Text key={idx}>Test: {msg}</Text>
+          ))}
+        {/* {this.state.asyncStorage && <BenchmarkResultsView title="AsyncStorage" {...this.state.asyncStorage} />}
+        {this.state.error && <Text>ERROR RUNNING: {this.state.error}</Text>} */}
+
+        {this.state.mmkv && (
+          <BenchmarkResultsView title="MMKV" {...this.state.mmkv} />
+        )}
       </View>
     );
   }
