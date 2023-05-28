@@ -1,22 +1,29 @@
-# react-native-leveldb
-Sponsored by ![GreenTriangle](https://www.green-triangle.com/wp-content/uploads/2021/04/Logo-300x66.png)
+![React Native LevelDB](./docs/RNLevelDBCover.png)
+
+# React Native's fastest KV store
 
 Superfast React Native bindings for LevelDB:
-* 2-7x faster than AsyncStorage or react-native-sqlite-storage - try the benchmarks under example/!
-* completely synchronous, blocking API (even on slow devices, a single read or write takes 0.1ms)
-* use it with Flatbuffers to turbo charge your app - support for binary data via ArrayBuffers
+
+- 2-7x faster than AsyncStorage or react-native-sqlite-storage - try the benchmarks under example/!
+- completely synchronous, blocking API (even on slow devices, a single read or write takes 0.1ms)
+- use it with Flatbuffers to turbo charge your app - support for binary data via ArrayBuffers
+
+## Sponsored by
+
+![GreenTriangle](https://www.green-triangle.com/wp-content/uploads/2021/04/Logo-300x66.png)
 
 ## Installation
 
 ```sh
 yarn add react-native-leveldb
-cd ios && pod install
 ```
+
+> Make sure you update your <kbd>Pods</kbd> by running `pod install`.
 
 ## Usage
 
 ```ts
-import {LevelDB} from "react-native-leveldb";
+import { LevelDB } from 'react-native-leveldb';
 
 // Open a potentially new database.
 const name = 'example.db';
@@ -26,7 +33,7 @@ const errorIfExists = false;
 const db = new LevelDB(name, createIfMissing, errorIfExists);
 
 // Insert something into the database. Note that the key and the
-// value can either be strings or ArrayBuffers. 
+// value can either be strings or ArrayBuffers.
 
 // Strings are read & written in utf8.
 db.put('key', 'value');
@@ -39,22 +46,60 @@ db.put(key.buffer, value.buffer);
 // Get values as string or as an ArrayBuffer (useful for binary data).
 const readStringValue = db.getStr('key');
 const readBufferValue = new Uint32Array(db.getBuf(key.buffer)!);
-console.log(readStringValue, readBufferValue);  // logs: value [654321]
+console.log(readStringValue, readBufferValue); // logs: value [654321]
 
 // Iterate over a range of values (here, from key "key" to the end.)
 let iter = db.newIterator();
 for (iter.seek('key'); iter.valid(); iter.next()) {
-// There are also *Buf version to access iterators' keys & values.
+  // There are also *Buf version to access iterators' keys & values.
   console.log(`iterating: "${iter.keyStr()}" / "${iter.valueStr()}"`);
 }
 
-// You need to close iterators when you are done with them. 
+// You need to close iterators when you are done with them.
 // Iterators will throw an error if used after this.
 iter.close();
 
-db.close();  // Same for databases.
-
+db.close(); // Same for databases.
 ```
+
+## API
+
+### `new LevelDB(path)`
+
+Creates a new LevelDB instance.
+
+Options
+
+1. `path` : Name/Path of the LevelDB database.
+2. `createIfMissing`: Boolean value to create a new DB if not exists.
+3. `errorIfExists`: Throws and error if a database with the same name already exists.
+
+### `put(key, value)`
+
+Sets the value for the given key.
+
+- `key`- `ArrayBuffer | string`.
+- `value` - `ArrayBuffer | string`.
+
+### `get(key)`
+
+Gets the value for the given key.
+
+- `key` - `ArrayBuffer | string`.
+
+### `delete(key)`
+
+Deletes the value for the given key.
+
+- `key` - `ArrayBuffer | string`.
+
+### `close()`
+
+Closes the database.
+
+### `closed()`
+
+Returns true if the database reference is closes.
 
 ## Contributing
 
