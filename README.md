@@ -1,4 +1,4 @@
-![React Native LevelDB](./docs/RNLevelDBCover.png)
+![React Native LevelDB](./docs/RNLevelDB-Cover.png)
 
 # React Native's fastest KV store
 
