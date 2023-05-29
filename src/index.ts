@@ -159,7 +159,10 @@ export class LevelDBIterator implements LevelDBIteratorI {
 type CreateDBOptions = {
   createIfMissing?: boolean;
   errorIfExists?: boolean;
+  compression?: boolean;
 };
+
+const CreateDBDefaultOptions = { createIfMissing: true, errorIfExists: false, compression: true };
 
 export class LevelDB implements LevelDBI {
   // Keep references to already open DBs here to facilitate RN's edit-refresh flow.
@@ -168,8 +171,8 @@ export class LevelDB implements LevelDBI {
   private static openPathRefs: { [name: string]: undefined | number } = {};
   private ref: undefined | number;
 
-  constructor(name: string, options: CreateDBOptions = { createIfMissing: true, errorIfExists: false }) {
-    const { createIfMissing, errorIfExists } = options;
+  constructor(name: string, options?: CreateDBOptions) {
+    const { createIfMissing, errorIfExists, compression } = {...CreateDBDefaultOptions, ...options};
     if (nativeModuleInitError) {
       throw new Error(nativeModuleInitError);
     }
@@ -177,7 +180,7 @@ export class LevelDB implements LevelDBI {
     if (LevelDB.openPathRefs[name] !== undefined) {
       this.ref = LevelDB.openPathRefs[name];
     } else {
-      LevelDB.openPathRefs[name] = this.ref = g.leveldbOpen(name, createIfMissing, errorIfExists);
+      LevelDB.openPathRefs[name] = this.ref = g.leveldbOpen(name, createIfMissing, errorIfExists, compression);
     }
   }
 

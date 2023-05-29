@@ -72,9 +72,9 @@ void installLeveldb(jsi::Runtime& jsiRuntime, std::string documentDir) {
   auto leveldbOpen = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forAscii(jsiRuntime, "leveldbOpen"),
-      3,  // db path, create_if_missing, error_if_exists
+      4,  // db path, create_if_missing, error_if_exists, compression
       [documentDir](jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* arguments, size_t count) -> jsi::Value {
-        if (!arguments[0].isString() || !arguments[1].isBool() || !arguments[2].isBool()) {
+        if (!arguments[0].isString() || !arguments[1].isBool() || !arguments[2].isBool() || !arguments[3].isBool()) {
           throw jsi::JSError(runtime, "leveldbOpen/invalid-params");
         }
 
@@ -82,6 +82,10 @@ void installLeveldb(jsi::Runtime& jsiRuntime, std::string documentDir) {
         std::string path = documentDir + arguments[0].getString(runtime).utf8(runtime);
         options.create_if_missing = arguments[1].getBool();
         options.error_if_exists = arguments[2].getBool();
+        if(arguments[3].getBool() == false){
+          options.compression = leveldb::kNoCompression;
+        }
+
         leveldb::DB* db;
         leveldb::Status status = leveldb::DB::Open(options, path, &db);
         dbs.push_back(std::unique_ptr<leveldb::DB>{db});
@@ -327,7 +331,7 @@ void installLeveldb(jsi::Runtime& jsiRuntime, std::string documentDir) {
       }
   );
   jsiRuntime.global().setProperty(jsiRuntime, "leveldbIteratorKeyStr", std::move(leveldbIteratorKeyStr));
-  
+
   auto leveldbIteratorKeyCompare = jsi::Function::createFromHostFunction
   (
    jsiRuntime,
