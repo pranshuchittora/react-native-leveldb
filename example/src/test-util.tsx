@@ -56,3 +56,7 @@ export function bufEquals(a_: ArrayBuffer, b_: ArrayBuffer) {
 
   return true;
 }
+
+export async function waitForGC(): Promise<void>{
+  return new Promise((resolve) => setTimeout(resolve, 5000))
+}

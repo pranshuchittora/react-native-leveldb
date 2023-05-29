@@ -7,6 +7,7 @@ import {
   BenchmarkResultsView
 } from "./benchmark";
 import {leveldbExample, leveldbTests} from "./example";
+import { waitForGC } from './test-util';
 
 interface BenchmarkState {
   leveldb?: BenchmarkResults;
@@ -19,14 +20,19 @@ interface BenchmarkState {
 export default class App extends React.Component<{}, BenchmarkState> {
   state: BenchmarkState = {leveldbTests: []};
 
-  componentDidMount() {
+  async componentDidMount() {
     try {
+      const leveldbRun = benchmarkLeveldb();
+      await waitForGC();
+      const leveldbExampleRun =  leveldbExample();
+      await waitForGC();
+      const leveldbTestsRun =  leveldbTests();
       this.setState({
-        leveldb: benchmarkLeveldb(),
-        leveldbExample: leveldbExample(),
-        leveldbTests: leveldbTests(),
+        leveldb: leveldbRun,
+        leveldbExample: leveldbExampleRun,
+        leveldbTests: leveldbTestsRun,
       });
-
+      await waitForGC();
       benchmarkAsyncStorage().then(res => this.setState({asyncStorage: res}));
     } catch (e) {
       console.error('Error running benchmark:', e);
