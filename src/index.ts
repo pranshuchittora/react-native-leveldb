@@ -62,7 +62,7 @@ export interface LevelDBIteratorI {
 
   /**
    * Executes a comparison using the underlying iterator's Compare(Slice ...) method
-   * @param target 
+   * @param target
    */
   compareKey(target: ArrayBuffer | string): number;
 }
@@ -156,6 +156,11 @@ export class LevelDBIterator implements LevelDBIteratorI {
   }
 }
 
+type CreateDBOptions = {
+  createIfMissing?: boolean;
+  errorIfExists?: boolean;
+};
+
 export class LevelDB implements LevelDBI {
   // Keep references to already open DBs here to facilitate RN's edit-refresh flow.
   // Note that when editing this file, this won't work, as RN will reload it and the openPathRefs
@@ -163,7 +168,8 @@ export class LevelDB implements LevelDBI {
   private static openPathRefs: { [name: string]: undefined | number } = {};
   private ref: undefined | number;
 
-  constructor(name: string, createIfMissing: boolean, errorIfExists: boolean) {
+  constructor(name: string, options: CreateDBOptions = { createIfMissing: true, errorIfExists: false }) {
+    const { createIfMissing, errorIfExists } = options;
     if (nativeModuleInitError) {
       throw new Error(nativeModuleInitError);
     }

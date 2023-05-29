@@ -12,7 +12,7 @@ export interface BenchmarkResults {
 export function benchmarkLeveldb(): BenchmarkResults {
   let name = getRandomString(32) + '.db';
   console.info('Opening DB', name);
-  const db = new LevelDB(name, true, true);
+  const db = new LevelDB(name, {createIfMissing: true, errorIfExists: true});
 
   let res: Partial<BenchmarkResults> = {};
 

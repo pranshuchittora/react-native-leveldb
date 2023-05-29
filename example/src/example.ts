@@ -6,7 +6,7 @@ export function leveldbExample(): boolean {
   const name = 'example.db';
   const createIfMissing = true;
   const errorIfExists = false;
-  const db = new LevelDB(name, createIfMissing, errorIfExists);
+  const db = new LevelDB(name, {createIfMissing, errorIfExists});
 
   // Insert something into the database. Note that the key and the
   // value can either be strings or ArrayBuffers.
@@ -43,7 +43,7 @@ export function leveldbExample(): boolean {
 export function leveldbTestMerge(batchMerge: boolean) {
   let nameDst = getRandomString(32) + '.db';
   console.info('leveldbTestMerge: Opening DB', nameDst);
-  const dbDst = new LevelDB(nameDst, true, true);
+  const dbDst = new LevelDB(nameDst, {createIfMissing: true, errorIfExists: true});
   dbDst.put('key1', 'value1');
   dbDst.put('key2', 'value2');
 
@@ -53,7 +53,7 @@ export function leveldbTestMerge(batchMerge: boolean) {
 
   let nameSrc = getRandomString(32) + '.db';
   console.info('leveldbTestMerge: Opening DB', nameSrc);
-  const dbSrc = new LevelDB(nameSrc, true, true);
+  const dbSrc = new LevelDB(nameSrc, {createIfMissing: true, errorIfExists: true});
   dbSrc.put('keep', 'value');
   dbSrc.put('key2', 'valueNew');
   const value3New = new Uint8Array([7, 8, 9]);
