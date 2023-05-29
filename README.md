@@ -1,6 +1,6 @@
 ![React Native LevelDB](./docs/RNLevelDB-Cover.png)
 
-# React Native's fastest KV store
+# Fastest KV store for React Native
 
 Superfast React Native bindings for LevelDB:
 
@@ -10,7 +10,9 @@ Superfast React Native bindings for LevelDB:
 
 ## Sponsored by
 
-![GreenTriangle](https://www.green-triangle.com/wp-content/uploads/2021/04/Logo-300x66.png)
+<a href="https://green-triangle.com/">
+  <img src="https://www.green-triangle.com/wp-content/uploads/2021/04/Logo-300x66.png" alt-text="Green Triangle logo" />
+</a>
 
 ## Installation
 
@@ -30,7 +32,7 @@ const name = 'example.db';
 const createIfMissing = true;
 const errorIfExists = false;
 
-const db = new LevelDB(name, createIfMissing, errorIfExists);
+const db = new LevelDB(name, { createIfMissing, errorIfExists });
 
 // Insert something into the database. Note that the key and the
 // value can either be strings or ArrayBuffers.
@@ -64,42 +66,97 @@ db.close(); // Same for databases.
 
 ## API
 
-### `new LevelDB(path)`
+### new LevelDB(path)
 
 Creates a new LevelDB instance.
 
 Options
 
-1. `path` : Name/Path of the LevelDB database.
-2. `createIfMissing`: Boolean value to create a new DB if not exists.
-3. `errorIfExists`: Throws and error if a database with the same name already exists.
+1. <kbd>path</kbd> : Name/Path of the LevelDB database.
+2. <kbd>options</kbd> (optional) : Object to define options for LevelDB database.
+    - <kbd>createIfMissing</kbd>: Boolean value to create a new DB if not exists. Defaults to `true`.
+    - <kbd>errorIfExists</kbd>: Throws and error if a database with the same name already exists. Defaults to `false`.
+    - <kbd>compression</kbd>: Boolean to enable or disable compression. Defaults to `true`.
 
-### `put(key, value)`
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+```
+
+### put(key, value)
 
 Sets the value for the given key.
 
-- `key`- `ArrayBuffer | string`.
-- `value` - `ArrayBuffer | string`.
+- <kbd>key</kbd>- `ArrayBuffer | string`.
+- <kbd>value</kbd> - `ArrayBuffer | string`.
 
-### `get(key)`
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.put('theme', 'dark');
+```
+
+### get(key)
 
 Gets the value for the given key.
 
-- `key` - `ArrayBuffer | string`.
+- <kbd>key</kbd> - `ArrayBuffer | string`.
 
-### `delete(key)`
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.put('theme', 'dark');
+userPreferences.get('theme'); // 'dark'
+```
+
+### delete(key)
 
 Deletes the value for the given key.
 
-- `key` - `ArrayBuffer | string`.
+- <kbd>key</kbd> - `ArrayBuffer | string`.
 
-### `close()`
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.delete('theme');
+```
+
+### close
 
 Closes the database.
 
-### `closed()`
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.close();
+```
+
+### closed
 
 Returns true if the database reference is closes.
+
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.closed(); // false
+userPreferences.close();
+userPreferences.closed(); // true
+```
+
+### destroyDB(path, force)
+
+Deletes the database from the filesystem.
+`destroyDB` is a static method.
+
+- <kbd>path</kbd> - `string` : Path/Name of the database.
+- <kbd>force</kbd> (optional) - `boolean` : Forcefully destroys the database by closing it, if required.
+
+> `Error: DB is open! Cannot destroy` : Make sure you close the database before destroying it. Or use the <kbd>force</kbd> flag
+
+```ts
+LevelDB.destroyDB('user-preferences.db');
+```
+
+### TODO: Add docs for iterator
 
 ## Contributing
 
