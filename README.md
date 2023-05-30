@@ -93,11 +93,12 @@ Sets the value for the given key.
 const userPreferences = new LevelDB('user-preferences.db');
 
 userPreferences.put('theme', 'dark');
+userPreferences.put(ArrayBuffer, 'dark');
 ```
 
-### get(key)
+### getStr(key)
 
-Gets the value for the given key.
+Gets the string value for the given key.
 
 - <kbd>key</kbd> - `ArrayBuffer | string`.
 
@@ -106,6 +107,19 @@ const userPreferences = new LevelDB('user-preferences.db');
 
 userPreferences.put('theme', 'dark');
 userPreferences.get('theme'); // 'dark'
+```
+
+### getBuf(key)
+
+Gets the buffer value for the given key.
+
+- <kbd>key</kbd> - `ArrayBuffer | string`.
+
+```ts
+const userPreferences = new LevelDB('user-preferences.db');
+
+userPreferences.put('theme', ArrayBuffer);
+userPreferences.get('theme'); // ArrayBuffer value
 ```
 
 ### delete(key)
